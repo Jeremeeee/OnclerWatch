@@ -91,7 +91,7 @@ def popular():
 
 
 # Lists all the information about a country
-@app.route('/country/country_name', methods=['GET'])
+@app.route('/country/country_name', methods=['POST'])
 def country_detail(country_name):
     data = request.get_json()
     country_name = data.get('username')
@@ -111,7 +111,7 @@ def country_detail(country_name):
 
 
 # Lists all the information about a subnation
-@app.route('/subnation/subnation_name', methods=['GET'])
+@app.route('/subnation/subnation_name', methods=['POST'])
 def subnation_detail():
     data = request.get_json()
     subnation_name = data.get('username')
