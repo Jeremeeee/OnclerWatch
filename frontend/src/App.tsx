@@ -12,7 +12,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get('http://127.0.0.1:8000/api/users')
+      .get('http://127.0.0.1:8080/api/users')
       .then((response) => {
         setUsers(response.data);
       })
