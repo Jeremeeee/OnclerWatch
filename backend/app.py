@@ -54,6 +54,9 @@ def check_login():
     cursor.execute("SELECT DISTINCT userId FROM users WHERE password = %s AND username = %s", (password, username))
     user = cursor.fetchone()
 
+    cursor.close()
+    connection.close()
+
     if user:
         return jsonify({"message": "Login successful"}), 200
     else:
