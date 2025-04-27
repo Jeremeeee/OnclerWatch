@@ -46,20 +46,28 @@ def check_login():
     WEBSITE_USER = data.get('username')
     password = data.get('password')
 
-    # Dummy check for now
-    if username == 'admin' and password == 'password123':
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("SELECT DISTINCT userId FROM users WHERE password = %s AND username = %s", (password, username))
+    user = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    if user:
         return jsonify({"message": "Login successful"}), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
 
 
 # Shows users' favorites
-@app.route('/favorites/<string:user>', methods=['GET'])
+@app.route('/favorites/user', methods=['GET'])
 def favorites():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute('SELECT DISTINCT location_id FROM favorites WHERE userId = WEBSITE_USER')
+    cursor.execute("SELECT DISTINCT location_id FROM favorites WHERE userId = %s" (WEBSITE_USER))
     favorites = cursor.fetchall()
 
     cursor.close()
@@ -73,7 +81,7 @@ def popular():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("SELECT DISTINCT country FROM countries WHERE userId = ''")
+    cursor.execute('SELECT DISTINCT country FROM countries ORDER BY views DESC LIMIT 10')
     favorites = cursor.fetchall()
 
     cursor.close()
@@ -84,10 +92,12 @@ def popular():
 # Lists all the information about a country
 @app.route('/country/country_name', methods=['GET'])
 def country_detail(country_name):
+    data = request.get_json()
+    country_name = data.get('username')
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM countries WHERE country_name = %s", (country_name,))
+    cursor.execute("SELECT * FROM countries WHERE country_name = %s" (country_name))
     country = cursor.fetchone()
 
     cursor.close()
@@ -101,11 +111,13 @@ def country_detail(country_name):
 
 # Lists all the information about a subnation
 @app.route('/subnation/subnation_name', methods=['GET'])
-def subnation_detail(subnation_name):
+def subnation_detail():
+    data = request.get_json()
+    subnation_name = data.get('username')
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM subnations WHERE subnation_name = %s", (subnation_name,))
+    cursor.execute("SELECT * FROM subnations WHERE subnation_name = %s" (subnation_name))
     subnation = cursor.fetchone()
 
     cursor.close()
