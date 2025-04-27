@@ -105,6 +105,7 @@ def country_detail(country_name):
     connection.close()
 
     if country:
+        cursor.execute("UPDATE countries SET views = views + 1 WHERE country_name = %s", (country_name,))
         return jsonify(country)
     else:
         return jsonify({"error": "Country not found"}), 404
@@ -125,12 +126,34 @@ def subnation_detail():
     connection.close()
 
     if subnation:
+        cursor.execute("UPDATE subnations SET views = views + 1 WHERE subnation_name = %s", (subnation_name,))
         return jsonify(subnation)
     else:
         return jsonify({"error": "Subnation not found"}), 404
 
 
+# Grabs all the statistics we made advanced queries for
+@app.route('/statistics', methods=['GET'])
+def statsitics() :
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
 
+    cursor.execute('SELECT * FROM country_carbon_status')
+    carbon_status = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM loss_ratio')
+    loss_ratio = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM below_average')
+    below_average = cursor.fetchall()
+
+    cursor.execute('SELECT * FROM above_average')
+    above_average = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+    l = [carbon_status, loss_ratio, below_average, above_average]
+    return jsonify(l)
 
 
 
