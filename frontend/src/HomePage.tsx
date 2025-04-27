@@ -40,6 +40,7 @@ const HomePage: React.FC = () => {
   const [lossRatio, setLossRatio] = useState<LossRatio[]>([]);
   const [belowAvgData, setBelowAvgData] = useState<BelowAverageData[]>([]);
   const [aboveAvgData, setAboveAvgData] = useState<AboveAverageData[]>([]);
+  const [activeTab, setActiveTab] = useState<string>('carbonEmissions');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -84,76 +85,144 @@ const HomePage: React.FC = () => {
    const filteredLossRatioData = lossRatio.filter(entry =>
     entry.country.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+  // Filter below average data based on search query
+  const filteredBelowAvgData = belowAvgData.filter((entry) =>
+    entry.subnational1.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Deforestation Statistics</h1>
 
-      {/* Net Emitters Bar Chart */}
-      <h2>Net Emitters (Countries emitting more carbon than they remove)</h2>
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={netEmitters}>
-          <XAxis dataKey="country" />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="total_emissions" fill="#8884d8" />
-        </BarChart>
-      </ResponsiveContainer>
+      {/* Tabs for Different Statistics */}
+      <div className="tabs">
+        <button
+          className={`tab-button ${activeTab === 'Carbon Emissions' ? 'active' : ''}`}
+          onClick={() => setActiveTab('carbonEmissions')}
+        >
+          Country Carbon Emissions
+        </button>
 
-      {/* Net Absorbers Bar Chart */}
-      <h2>Net Absorbers (Countries absorbing more carbon than they emit)</h2>
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={netAbsorbers}>
-          <XAxis dataKey="country" />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="total_removals" fill="#82ca9d" />
-        </BarChart>
-      </ResponsiveContainer>
+        <button
+          className={`tab-button ${activeTab === 'Losses of Countries' ? 'active' : ''}`}
+          onClick={() => setActiveTab('lossRatio')}
+        >
+          Primary Forest Loss for Countries
+        </button>
 
-      {/* Search bar for Loss Ratio Table */}
-      <h2>Loss Ratio Table</h2>
-      <input
-        type="text"
-        placeholder="Search by Country"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        style={{ padding: '0.5rem', width: '300px', marginBottom: '20px' }}
-      />
+        <button
+          className={`tab-button ${activeTab === 'Below Average' ? 'active' : ''}`}
+          onClick={() => setActiveTab('belowAvg')}
+        >
+          Subnations with Below Average Carbon Stocks 
+        </button>
 
-      {/* Display the filtered Loss Ratio data in a table */}
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-        <thead>
-          <tr>
-            <th style={{ padding: '10px', border: '1px solid #ddd' }}>Country</th>
-            <th style={{ padding: '10px', border: '1px solid #ddd' }}>Net Loss</th>
-            <th style={{ padding: '10px', border: '1px solid #ddd' }}>Rank Position</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredLossRatioData.map((entry, index) => (
-            <tr key={index}>
-              <td style={{ padding: '10px', border: '1px solid #ddd' }}>{entry.country}</td>
-              <td style={{ padding: '10px', border: '1px solid #ddd' }}>{entry.net_loss}</td>
-              <td style={{ padding: '10px', border: '1px solid #ddd' }}>{entry.rank_position}</td>
+        <button
+          className={`tab-button ${activeTab === 'Above Average' ? 'active' : ''}`}
+          onClick={() => setActiveTab('aboveAvg')}
+        >
+          Subnations with Above National Average Primary Forest Loss
+        </button>
+
+      </div>
+      {activeTab === 'carbonEmissions' && (
+        <>
+        {/* Net Emitters Bar Chart */}
+        <h2>Net Emitters (Countries emitting more carbon than they remove) in Megagrams of CO2/yr</h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={netEmitters}>
+            <XAxis dataKey="country" />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="total_emissions" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
+
+        {/* Net Absorbers Bar Chart */}
+        <h2>Net Absorbers (Countries absorbing more carbon than they emit) in Megagrams of CO2/yr</h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={netAbsorbers}>
+            <XAxis dataKey="country" />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="total_removals" fill="#82ca9d" />
+          </BarChart>
+        </ResponsiveContainer>
+        </>
+      )}
+
+      {activeTab === 'lossRatio' && (
+      <>
+        {/* Search bar for Loss Ratio Table */}
+        <h2>Loss Ratio Table</h2>
+        <input
+          type="text"
+          placeholder="Search by Country"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ padding: '0.5rem', width: '300px', marginBottom: '20px' }}
+        />
+
+        {/* Display the filtered Loss Ratio data in a table */}
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
+          <thead>
+            <tr>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Rank Position</th>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Country</th>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Net Loss (Hectares)</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredLossRatioData.map((entry, index) => (
+              <tr key={index}>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{entry.rank_position}</td>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{entry.country}</td>
+                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{entry.net_loss}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </>
+      )}
 
-      {/* Below Average Carbon Stocks Bar Chart */}
-      <h2>Below Average Carbon Stocks by Subnational Entity</h2>
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={belowAverageData}>
-          <XAxis dataKey="subnational1" />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="total_carbon_stocks" fill="#7d2ae8" />
-        </BarChart>
-      </ResponsiveContainer>
+      {activeTab === 'belowAvg' && (
+        <>
+        {/* Below Average Carbon Stocks Bar Chart */}
+        <h2>Below Average Carbon Stocks in Megagrams of Carbon</h2>
+        {/* Search Bar for Filtering */}
+        <input
+          type="text"
+          placeholder="Search by subnational name..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          style={{
+            padding: '8px',
+            marginBottom: '20px',
+            width: '100%',
+            border: '1px solid #ccc',
+            borderRadius: '5px',
+            fontSize: '16px',
+          }}
+        />
 
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={filteredBelowAvgData}>
+            <XAxis dataKey="subnational1" />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="total_carbon_stocks" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
+      </>
+      )}
+
+      {activeTab === 'aboveAvg' && (
+        <>
       {/* Above Average Primary Loss - Cards */}
-      <h2>Above Average Primary Loss by Subnational Entity</h2>
+      <h2>Above Average Primary Loss by Subnation in Hectares</h2>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
         {aboveAverageData.map((entry) => (
           <div
@@ -168,12 +237,14 @@ const HomePage: React.FC = () => {
             }}
           >
             <h3>{entry.subnational1 + ": " + entry.country}</h3>
-            <p><strong>Primary Loss:</strong> {entry.subnational_primary_loss}</p>
+            <p><strong>Primary Loss:</strong> {entry.subnational_primary_loss + " ha"}</p>
           </div>
         ))}
-      </div>
-    </div>
-  );
+     </div>
+     </>
+   )}
+ </div>
+);
 };
 
 export default HomePage;
