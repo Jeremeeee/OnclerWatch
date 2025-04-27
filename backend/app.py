@@ -38,8 +38,6 @@ def index():
     return jsonify(users)
 
 
-
-
 # Verify user exists
 @app.route('/login/user', methods=['POST'])
 def check_login():
@@ -75,6 +73,7 @@ def favorites():
     cursor.close()
     connection.close()
     return jsonify(favorites)
+
 
 # Lists most viewed countries and subnations
 @app.route('/popular', methods=['GET'])
