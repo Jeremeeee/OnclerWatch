@@ -20,14 +20,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
         password,
       });
 
-      if (response.data.success) {
+      if (response.status === 200) {
         onLoginSuccess();
-      } else {
-        setError('Invalid username or password');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Login error:', err);
-      setError('Server error. Please try again.');
+
+      if (err.response && err.response.status === 401) {
+        setError('Invalid username or password');
+      } else {
+        setError('Server error. Please try again.');
+      }
     }
   };
 
