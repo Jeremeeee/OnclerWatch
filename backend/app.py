@@ -38,8 +38,6 @@ def index():
     return jsonify(users)
 
 
-
-
 # Verify user exists
 @app.route('/login/user', methods=['POST'])
 def check_login():
@@ -67,6 +65,7 @@ def favorites():
     cursor.close()
     connection.close()
     return jsonify(favorites)
+
 
 # Lists most viewed countries and subnations
 @app.route('/popular', methods=['GET'])
@@ -116,14 +115,6 @@ def subnation_detail(subnation_name):
         return jsonify(subnation)
     else:
         return jsonify({"error": "Subnation not found"}), 404
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=8080)
