@@ -25,25 +25,13 @@ interface SubnationData extends CountryData {
 const LocationsPage: React.FC = () => {
   const [countrySearch, setCountrySearch] = useState<string>('');
   const [subnationSearch, setSubnationSearch] = useState<string>('');
-  const [popularCountries, setPopularCountries] = useState<{ country: string }[]>([]);
   const [favorites, setFavorites] = useState<CountryData[]>([]);
-  const [selectedFavorite, setSelectedFavorite] = useState<CountryData | null>(null);
   const [countryResult, setCountryResult] = useState<CountryData | null>(null);
   const [subnationResult, setSubnationResult] = useState<SubnationData | null>(null);
 
-  useEffect(() => {
-    axios.get('http://127.0.0.1:8080/popular')
-      .then(response => {
-        setPopularCountries(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching popular countries:', error);
-      });
-  }, []);
-
   const handleCountrySearch = () => {
     if (!countrySearch) return;
-    axios.post(`http://127.0.0.1:8080/country`, { username: countrySearch })
+    axios.post(`http://127.0.0.1:8080/country/country_name`, { username: countrySearch })
       .then(response => {
         setCountryResult(response.data);
       })
@@ -63,16 +51,6 @@ const LocationsPage: React.FC = () => {
         console.error('Error fetching subnation:', error);
         setSubnationResult(null);
       });
-  };
-
-  const handleAddFavorite = (country: CountryData) => {
-    if (!favorites.find(fav => fav.location_id === country.location_id)) {
-      setFavorites([...favorites, country]);
-    }
-  };
-
-  const handleSelectFavorite = (country: CountryData) => {
-    setSelectedFavorite(country);
   };
 
   const formatNumber = (num: number) => {
@@ -101,12 +79,6 @@ const LocationsPage: React.FC = () => {
             <p>Carbon Stocks (2000): {formatNumber(countryResult.gfw_aboveground_carbon_stocks_2000__Mg_C)} Mg C</p>
             <p>Forest Carbon Net Flux: {formatNumber(countryResult.gfw_forest_carbon_net_flux__Mg_CO2e_yr)} Mg CO2e/yr</p>
             <p>Tree Cover Loss (2023): {formatNumber(countryResult.tc_loss_ha_2023)} ha</p>
-            <button
-              onClick={() => handleAddFavorite(countryResult)}
-              style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}
-            >
-              Add to Favorites
-            </button>
           </div>
         )}
       </div>
@@ -132,30 +104,6 @@ const LocationsPage: React.FC = () => {
           </div>
         )}
       </div>
-
-      <div style={{ marginBottom: '2rem' }}>
-        <h2>Favorite Locations</h2>
-        {favorites.length === 0 && <p>No favorite countries added yet.</p>}
-        {favorites.map((fav) => (
-          <div
-            key={fav.location_id}
-            style={{ marginTop: '0.5rem', cursor: 'pointer', color: 'blue' }}
-            onClick={() => handleSelectFavorite(fav)}
-          >
-            {fav.country}
-          </div>
-        ))}
-      </div>
-
-      {selectedFavorite && (
-        <div style={{ marginTop: '2rem', padding: '1rem', border: '1px solid #ccc' }}>
-          <h2>Selected Favorite: {selectedFavorite.country}</h2>
-          <p>Tree Cover Extent (2000): {formatNumber(selectedFavorite.umd_tree_cover_extent_2000__ha)} ha</p>
-          <p>Carbon Stocks (2000): {formatNumber(selectedFavorite.gfw_aboveground_carbon_stocks_2000__Mg_C)} Mg C</p>
-          <p>Forest Carbon Net Flux: {formatNumber(selectedFavorite.gfw_forest_carbon_net_flux__Mg_CO2e_yr)} Mg CO2e/yr</p>
-          <p>Tree Cover Loss (2023): {formatNumber(selectedFavorite.tc_loss_ha_2023)} ha</p>
-        </div>
-      )}
     </div>
   );
 };
