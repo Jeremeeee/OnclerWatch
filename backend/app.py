@@ -41,6 +41,7 @@ def index():
 # Verify user exists
 @app.route('/login/user', methods=['POST'])
 def check_login():
+    global WEBSITE_USER
     data = request.get_json()
     username = data.get('username')
     WEBSITE_USER = data.get('username')
@@ -61,18 +62,36 @@ def check_login():
         return jsonify({"message": "Invalid credentials"}), 401
 
 
-# Shows users' favorites
+# Get up to 10 favorite user locations
 @app.route('/favorites/user', methods=['GET'])
 def favorites():
+    global WEBSITE_USER
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-
-    cursor.execute("SELECT DISTINCT location_id,country FROM favorites WHERE userId = %s", (WEBSITE_USER,))
+    
+    cursor.execute("SELECT userId FROM users WHERE username = %s", (WEBSITE_USER,))
+    user = cursor.fetchone()
+    
+    cursor.execute("""
+        SELECT f.location_id, 
+               IFNULL(cd.country, sd.subnational1) AS location_name, 
+               CASE 
+                   WHEN cd.country IS NOT NULL THEN 'country'
+                   ELSE 'subnational'
+               END AS location_type
+        FROM favorites f
+        LEFT JOIN country_data cd ON f.location_id = cd.location_id
+        LEFT JOIN subnational_data sd ON f.location_id = sd.location_id
+        WHERE f.userId = %s
+    """, (user['userId'],))
     favorites = cursor.fetchall()
+
+    # print(f"Fetched favorites for user {WEBSITE_USER}: {favorites}") 
 
     cursor.close()
     connection.close()
     return jsonify(favorites)
+
 
 # Lists most viewed countries and subnations
 @app.route('/popular', methods=['GET'])
@@ -86,6 +105,68 @@ def popular():
     cursor.close()
     connection.close()
     return jsonify(favorites)
+
+# Add a location given by the user to favorites
+@app.route('/addfavorite', methods=['POST'])
+def add_favorite():
+    global WEBSITE_USER
+    data = request.get_json()
+    username = WEBSITE_USER
+    location_name = data.get('location_name')
+
+    if not username or not location_name:
+        return jsonify({'error': 'Missing username or location_name'}), 400
+    
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        # Get userId from username
+        cursor.execute("SELECT userId FROM users WHERE username = %s", (username,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        user_id = user['userId']
+        
+        # Count how many favorites the user already has
+        cursor.execute("SELECT COUNT(*) AS favorite_count FROM favorites WHERE userId = %s", (user_id,))
+        count_result = cursor.fetchone()
+
+        if count_result['favorite_count'] == 10:
+            return jsonify({'error': 'Maximum number of favorites (10) reached'}), 403
+
+        # Try finding location_id in country_data
+        cursor.execute("SELECT location_id FROM country_data WHERE country = %s", (location_name,))
+        location = cursor.fetchone()
+
+        # If not found in country_data, check subnational_data
+        if not location:
+            cursor.execute("SELECT location_id FROM subnational_data WHERE subnational1 = %s", (location_name,))
+            location = cursor.fetchone()
+
+        if not location:
+            return jsonify({'error': 'Location not found'}), 404
+
+        location_id = location['location_id']
+
+        # Step 4: Insert into favorites
+        insert_sql = "INSERT INTO favorites (userId, location_id) VALUES (%s, %s)"
+        cursor.execute(insert_sql, (user_id, location_id))
+        connection.commit()
+
+        return jsonify({'message': 'Favorite added successfully'}), 201
+
+    except mysql.connector.Error as err:
+        if err.errno == 1062:  # Duplicate favorite (primary key conflict)
+            return jsonify({'error': 'Favorite already exists'}), 409
+        print(err)
+        return jsonify({'error': 'An error occurred'}), 500
+
+    finally:
+        cursor.close()
+        connection.close()
 
 
 # Lists all the information about a country

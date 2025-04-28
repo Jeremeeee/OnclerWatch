@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-// Proper interfaces based on your database schema
 interface CountryData {
   location_id: number;
   country: string;
   views: number;
 }
 
+interface FavLocation {
+  location_id: number;
+  location_name: string;
+  location_type: 'country' | 'subnational'; 
+}
+
 const Top10Countries: React.FC = () => {
   const [popularCountries, setPopularCountries] = useState<CountryData[]>([]);
-  const [favorites, setFavorites] = useState<CountryData[]>([]);
+  const [favorites, setFavorites] = useState<FavLocation[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch popular countries (most viewed)
@@ -31,9 +36,11 @@ const Top10Countries: React.FC = () => {
     axios.get('http://127.0.0.1:8080/favorites/user')
       .then(response => {
         setFavorites(response.data);
+        setLoading(false)
       })
       .catch(error => {
         console.error('Error fetching user favorites:', error);
+        setLoading(false)
       });
   }, []);
 
@@ -66,14 +73,20 @@ const Top10Countries: React.FC = () => {
 
       {/* User's Favorite Locations Section */}
       <div className="section">
-        <h2 className="sectionTitle">Your Favorite Locations</h2>
-        {favorites.length === 0 ? (
-          <p className="noData">No favorite locations added yet.</p>
+        <h2 className="sectionTitle">Your Favorites!</h2>
+        {loading ? (
+          <p className="loading">Loading...</p>
+        ) : favorites.length === 0 ? (
+          <p className="noData">No Favorites Present</p>
         ) : (
           <div className="table">
             {favorites.map((fav) => (
               <div key={fav.location_id} className="tableRow">
-                <p className="countryText"><strong>{fav.country}</strong></p>
+                <p className="countryText">
+                  <strong>{fav.location_name}</strong>
+                  <br />
+                  <span className="type">({fav.location_type})</span>
+                </p>
               </div>
             ))}
           </div>

@@ -53,6 +53,20 @@ const LocationsPage: React.FC = () => {
       });
   };
 
+  const handleAddFavorite = (locationName: string) => {
+    axios.post(`http://127.0.0.1:8080/addfavorite`, { location_name: locationName })
+      .then(response => {
+        alert('Location added to favorites!');
+      })
+      .catch(error => {
+        if (error.response && error.response.data && error.response.data.error) {
+          alert(`Error: ${error.response.data.error}`);
+        } else {
+          alert('An error occurred while adding to favorites.');
+        }
+      });
+  };
+
   const formatNumber = (num: number) => {
     return num.toLocaleString();
   };
@@ -79,6 +93,12 @@ const LocationsPage: React.FC = () => {
             <p>Carbon Stocks (2000): {formatNumber(countryResult.gfw_aboveground_carbon_stocks_2000__Mg_C)} Mg C</p>
             <p>Forest Carbon Net Flux: {formatNumber(countryResult.gfw_forest_carbon_net_flux__Mg_CO2e_yr)} Mg CO2e/yr</p>
             <p>Tree Cover Loss (2023): {formatNumber(countryResult.tc_loss_ha_2023)} ha</p>
+            <button
+              onClick={() => handleAddFavorite(countryResult.country)}
+              style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}
+            >
+              Add to Favorites
+            </button>
           </div>
         )}
       </div>
@@ -101,6 +121,12 @@ const LocationsPage: React.FC = () => {
             <p>Carbon Stocks (2000): {formatNumber(subnationResult.gfw_aboveground_carbon_stocks_2000__Mg_C)} Mg C</p>
             <p>Forest Carbon Net Flux: {formatNumber(subnationResult.gfw_forest_carbon_net_flux__Mg_CO2e_yr)} Mg CO2e/yr</p>
             <p>Tree Cover Loss (2023): {formatNumber(subnationResult.tc_loss_ha_2023)} ha</p>
+            <button
+              onClick={() => handleAddFavorite(subnationResult.subnational1)}
+              style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}
+            >
+              Add to Favorites
+            </button>
           </div>
         )}
       </div>
