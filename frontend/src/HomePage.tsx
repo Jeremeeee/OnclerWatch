@@ -70,13 +70,7 @@ const HomePage: React.FC = () => {
   // Filter data for specific categories
   const netEmitters = carbonStatus.filter((entry) => entry.total_emissions > entry.total_removals);
   const netAbsorbers = carbonStatus.filter((entry) => entry.total_removals > entry.total_emissions);
-
-  // Loss Ratio chart data
-  const lossRatioData = lossRatio.filter((entry) => entry.net_loss !== undefined);
-
-  // Below Average chart data
-  const belowAverageData = belowAvgData.filter((entry) => entry.total_carbon_stocks !== undefined);
-
+  
   // Above Average chart data
   const aboveAverageData = aboveAvgData.filter((entry) => entry.subnational_primary_loss !== undefined);
 
