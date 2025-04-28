@@ -97,35 +97,35 @@ const HomePage: React.FC = () => {
           className={`tab-button ${activeTab === 'Carbon Emissions' ? 'active' : ''}`}
           onClick={() => setActiveTab('carbonEmissions')}
         >
-          Country Carbon Emissions
+          Carbon Emissions Data for all Countries
         </button>
 
         <button
           className={`tab-button ${activeTab === 'Losses of Countries' ? 'active' : ''}`}
           onClick={() => setActiveTab('lossRatio')}
         >
-          Primary Forest Loss for Countries
+          Top 100 Countries with Highest Forest Loss
         </button>
 
         <button
           className={`tab-button ${activeTab === 'Below Average' ? 'active' : ''}`}
           onClick={() => setActiveTab('belowAvg')}
         >
-          Subnations with Below Average Carbon Stocks 
+          Subnations with Total Carbon Stocks Below Average 
         </button>
 
         <button
           className={`tab-button ${activeTab === 'Above Average' ? 'active' : ''}`}
           onClick={() => setActiveTab('aboveAvg')}
         >
-          Subnations with Above National Average Primary Forest Loss
+          Subnations who have lost more forests than the national average
         </button>
 
       </div>
       {activeTab === 'carbonEmissions' && (
         <>
         {/* Net Emitters Bar Chart */}
-        <h2>Net Emitters (Countries emitting more carbon than they remove) in Megagrams of CO2/yr</h2>
+        <h2>The following countries are <b>Net Emitters</b>: countries emitting more carbon than they absorb.</h2>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={netEmitters}>
             <XAxis dataKey="country" />
@@ -136,7 +136,7 @@ const HomePage: React.FC = () => {
         </ResponsiveContainer>
 
         {/* Net Absorbers Bar Chart */}
-        <h2>Net Absorbers (Countries absorbing more carbon than they emit) in Megagrams of CO2/yr</h2>
+        <h2>The following countries are <b>Net Absorbers</b>: countries absorbing more carbon than they emit.</h2>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={netAbsorbers}>
             <XAxis dataKey="country" />
@@ -151,7 +151,6 @@ const HomePage: React.FC = () => {
       {activeTab === 'lossRatio' && (
       <>
         {/* Search bar for Loss Ratio Table */}
-        <h2>Loss Ratio Table</h2>
         <input
           type="text"
           placeholder="Search by Country"
@@ -166,7 +165,7 @@ const HomePage: React.FC = () => {
             <tr>
               <th style={{ padding: '10px', border: '1px solid #ddd' }}>Rank Position</th>
               <th style={{ padding: '10px', border: '1px solid #ddd' }}>Country</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Net Loss (Hectares)</th>
+              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Net Forest Loss in Hectares (ha) of land</th>
             </tr>
           </thead>
           <tbody>
@@ -185,7 +184,7 @@ const HomePage: React.FC = () => {
       {activeTab === 'belowAvg' && (
         <>
         {/* Below Average Carbon Stocks Bar Chart */}
-        <h2>Below Average Carbon Stocks in Megagrams of Carbon</h2>
+        <h2>Subnations who have Carbon stocks below the national average in Megagrams of Carbon (Mg of C)</h2>
         {/* Search Bar for Filtering */}
         <input
           type="text"
@@ -216,7 +215,8 @@ const HomePage: React.FC = () => {
       {activeTab === 'aboveAvg' && (
         <>
       {/* Above Average Primary Loss - Cards */}
-      <h2>Above Average Primary Loss by Subnation in Hectares</h2>
+      <h2>Subnations who have lost more forests than the national average: </h2>
+      <h3>The forest lost is in Hectares (ha)</h3>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
         {aboveAverageData.map((entry) => (
           <div
