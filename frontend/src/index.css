@@ -6,6 +6,64 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* Style the container for the tab buttons */
+.tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ccc;
+}
+
+/* Style for individual tab buttons */
+.tab-button {
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #f5f5f5;
+  color: #555;
+  border: 2px solid transparent;
+  border-radius: 10px 10px 0 0; /* Rounded corners for the top of the button */
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover effect for tab buttons */
+.tab-button:hover {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+  transform: translateY(-3px);
+}
+
+/* Active tab button styling */
+.tab-button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+  font-size: 18px; /* Slightly bigger text for emphasis */
+  transform: translateY(-3px); /* Slightly lifted for active state */
+}
+
+/* Optional: Icon styling for the tabs if you want to add icons next to the text */
+.tab-button svg {
+  margin-right: 8px; /* Spacing between icon and text */
+  fill: currentColor; /* Ensures the icon matches the text color */
+}
+
+/* Add a subtle shadow for the whole tab section */
+.tabs {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Active tab underline effect */
+.tab-button.active {
+  border-bottom: 3px solid #0056b3;
+}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
