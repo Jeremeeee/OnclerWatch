@@ -56,7 +56,12 @@ const LocationsPage: React.FC = () => {
   const handleAddFavorite = (locationName: string) => {
     axios.post(`http://127.0.0.1:8080/addfavorite`, { location_name: locationName })
       .then(response => {
-        alert('Location added to favorites!');
+        if (response.status == 201) {
+          alert('Location added to favorites!');
+        } else if (response.status == 200) {
+          alert('Location removed from favorites!')
+        }
+        
       })
       .catch(error => {
         if (error.response && error.response.data && error.response.data.error) {

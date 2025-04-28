@@ -160,7 +160,14 @@ def add_favorite():
 
     except mysql.connector.Error as err:
         if err.errno == 1062:  # Duplicate favorite (primary key conflict)
-            return jsonify({'error': 'Favorite already exists'}), 409
+            # return jsonify({'error': 'Favorite already exists'}), 409
+            cursor.execute(
+                "DELETE FROM favorites WHERE userId = %s AND location_id = %s",
+                (user_id, location_id)
+            )
+            connection.commit()
+            
+            return jsonify({'message': 'Favorite removed successfully'}), 200
         print(err)
         return jsonify({'error': 'An error occurred'}), 500
 
