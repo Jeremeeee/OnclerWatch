@@ -67,13 +67,12 @@ def favorites():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("SELECT DISTINCT location_id FROM favorites WHERE userId = %s" (WEBSITE_USER))
+    cursor.execute("SELECT DISTINCT location_id,country FROM favorites WHERE userId = %s", (WEBSITE_USER,))
     favorites = cursor.fetchall()
 
     cursor.close()
     connection.close()
     return jsonify(favorites)
-
 
 # Lists most viewed countries and subnations
 @app.route('/popular', methods=['GET'])
@@ -81,7 +80,7 @@ def popular():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute('SELECT DISTINCT country FROM countries ORDER BY views DESC LIMIT 10')
+    cursor.execute('SELECT DISTINCT country,views FROM country_data ORDER BY views DESC LIMIT 10')
     favorites = cursor.fetchall()
 
     cursor.close()
@@ -91,43 +90,47 @@ def popular():
 
 # Lists all the information about a country
 @app.route('/country/country_name', methods=['POST'])
-def country_detail(country_name):
+def country_detail():
     data = request.get_json()
     country_name = data.get('username')
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM countries WHERE country_name = %s" (country_name))
+    cursor.execute("SELECT * FROM country_data WHERE country = %s", (country_name,))
     country = cursor.fetchone()
 
-    cursor.close()
-    connection.close()
-
     if country:
-        cursor.execute("UPDATE countries SET views = views + 1 WHERE country_name = %s", (country_name,))
+        cursor.execute("UPDATE country_data SET views = views + 1 WHERE country = %s", (country_name,))
+        connection.commit()
+        cursor.close()
+        connection.close()
         return jsonify(country)
     else:
+        cursor.close()
+        connection.close()
         return jsonify({"error": "Country not found"}), 404
 
 
 # Lists all the information about a subnation
-@app.route('/subnation/subnation_name', methods=['POST'])
+@app.route('/subnation', methods=['POST'])
 def subnation_detail():
     data = request.get_json()
     subnation_name = data.get('username')
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM subnations WHERE subnation_name = %s" (subnation_name))
+    cursor.execute("SELECT * FROM subnational_data WHERE subnational1 = %s", (subnation_name,))
     subnation = cursor.fetchone()
 
-    cursor.close()
-    connection.close()
-
     if subnation:
-        cursor.execute("UPDATE subnations SET views = views + 1 WHERE subnation_name = %s", (subnation_name,))
+        cursor.execute("UPDATE subnational_data SET views = views + 1 WHERE subnational1 = %s", (subnation_name,))
+        connection.commit()
+        cursor.close()
+        connection.close()
         return jsonify(subnation)
     else:
+        cursor.close()
+        connection.close()
         return jsonify({"error": "Subnation not found"}), 404
 
 
