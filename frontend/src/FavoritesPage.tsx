@@ -23,8 +23,7 @@ const FavoritesPage: React.FC = () => {
             setLoading(false);
         })
         .catch((error) => {
-            console.error('Error fetching favorites:', error);
-            setError('Error fetching favorites. Please try again.');
+            setError('Error fetching favorites.');
             setLoading(false);
         });
 }, []);
