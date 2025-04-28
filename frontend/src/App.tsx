@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import LoginPage from './LoginPage';
 import HomePage from './HomePage';
+import FavoritesPage from './FavoritesPage';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
